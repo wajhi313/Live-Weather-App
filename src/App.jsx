@@ -10,23 +10,35 @@ import "./index.css";
 import Swal from "sweetalert2";
 
 export default function App() {
-  // offline mode
+  // Offline mode & Safe localStorage for mobile
   const [weather, setWeather] = useState(() => {
-    const savedWeather = localStorage.getItem("last_weather");
-    return savedWeather ? JSON.parse(savedWeather) : null;
+    try {
+      const savedWeather = localStorage.getItem("last_weather");
+      return savedWeather ? JSON.parse(savedWeather) : null;
+    } catch {
+      return null;
+    }
   });
 
   const [favourites, setFavourites] = useState(() => {
-    const savedFavs = localStorage.getItem("favourite_cities");
-    return savedFavs ? JSON.parse(savedFavs) : [];
+    try {
+      const savedFavs = localStorage.getItem("favourite_cities");
+      return savedFavs ? JSON.parse(savedFavs) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [darkMode, setDarkMode] = useState(true);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
-  const [notificationPermission, setNotificationPermission] = useState(
-    () => Notification.permission,
-  );
+  // Safe notification permission check for mobile browsers
+  const [notificationPermission, setNotificationPermission] = useState(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      return Notification.permission;
+    }
+    return "unsupported";
+  });
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -42,8 +54,18 @@ export default function App() {
   }, []);
 
   const handleEnableNotifications = async () => {
-    const permission = await Notification.requestPermission();
+    if (!("Notification" in window)) {
+      Swal.fire({
+        icon: "info",
+        title: "Not Supported",
+        text: "Notifications are not supported on this mobile browser.",
+        background: "#1e293b",
+        color: "#fff",
+      });
+      return;
+    }
 
+    const permission = await Notification.requestPermission();
     setNotificationPermission(permission);
 
     if (permission === "granted") {
@@ -135,7 +157,6 @@ export default function App() {
       const updated = favourites.filter((fav) => fav.name !== cityName);
 
       setFavourites(updated);
-
       localStorage.setItem("favourite_cities", JSON.stringify(updated));
 
       Swal.fire({
@@ -189,55 +210,53 @@ export default function App() {
       {/* Main Content */}
       <main className="relative z-10 max-w-6xl mx-auto px-5 py-8 md:px-8">
         {/* Navbar */}
-        
-<header className="flex flex-wrap items-center justify-between gap-3 mb-8 md:mb-12">
+        <header className="flex flex-wrap items-center justify-between gap-3 mb-8 md:mb-12">
+          {/* Logo */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 shrink-0">
+              <CloudSun size={26} className="text-white" />
+            </div>
 
-  {/* Logo */}
-  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-    <div className="p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 shrink-0">
-      <CloudSun size={26} className="text-white" />
-    </div>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight whitespace-nowrap">
+                Weather<span className="text-blue-500">Board</span>
+              </h1>
+              <p
+                className={`text-[10px] sm:text-xs ${
+                  darkMode ? "text-slate-400" : "text-slate-500"
+                }`}
+              >
+                Your personal weather companion
+              </p>
+            </div>
+          </div>
 
-    <div className="min-w-0">
-      <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight whitespace-nowrap">
-        Weather<span className="text-blue-500">Board</span>
-      </h1>
-      <p className={`text-[10px] sm:text-xs ${
-        darkMode ? "text-slate-400" : "text-slate-500"
-      }`}>
-        Your personal weather companion
-      </p>
-    </div>
-  </div>
+          {/* Theme Button */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`p-2.5 sm:p-3 rounded-2xl border shrink-0 transition-all ${
+              darkMode
+                ? "bg-slate-800 border-slate-700 text-yellow-400"
+                : "bg-white border-blue-100 text-indigo-600 shadow-md"
+            }`}
+            title="Toggle Day/Night Mode"
+          >
+            {darkMode ? <Sun size={22} /> : <Moon size={22} />}
+          </button>
 
-  {/* Theme Button */}
-  <button
-    onClick={() => setDarkMode(!darkMode)}
-    className={`p-2.5 sm:p-3 rounded-2xl border shrink-0 transition-all ${
-      darkMode
-        ? "bg-slate-800 border-slate-700 text-yellow-400"
-        : "bg-white border-blue-100 text-indigo-600 shadow-md"
-    }`}
-    title="Toggle Day/Night Mode"
-  >
-    {darkMode ? <Sun size={22} /> : <Moon size={22} />}
-  </button>
+          {/* Notification Button */}
+          <button
+            onClick={handleEnableNotifications}
+            disabled={notificationPermission === "granted"}
+            className="w-full md:w-auto md:ml-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-all disabled:opacity-50"
+          >
+            {notificationPermission === "granted"
+              ? "Notifications Enabled ✓"
+              : "🔔 Enable Notifications"}
+          </button>
+        </header>
 
-  {/* Notification Button */}
-  <button
-    onClick={handleEnableNotifications}
-    disabled={notificationPermission === "granted"}
-    className="w-full md:w-auto md:ml-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-all disabled:opacity-50"
-  >
-    {notificationPermission === "granted"
-      ? "Notifications Enabled ✓"
-      : "🔔 Enable Notifications"}
-  </button>
-
-</header>
-
-
-        {/* Welcome bro */}
+        {/* Welcome Section */}
         <section className="text-center mb-10">
           <div
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm mb-5 ${

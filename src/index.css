@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+
+
+/* Large Mobile Devices */
+@media (max-width: 480px) {
+
+  main {
+    padding: 20px 14px;
+  }
+
+  header {
+    margin-bottom: 30px;
+  }
+
+  header h1 {
+    font-size: 21px;
+  }
+
+  header p {
+    font-size: 10px;
+  }
+
+  section {
+    margin-bottom: 20px;
+  }
+
+  section h2 {
+    font-size: 27px;
+  }
+
+  section h3 {
+    font-size: 17px;
+  }
+
+  input {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 13px;
+  }
+
+  footer {
+    font-size: 12px;
+  }
+
+  /* weather card */
+  .weather-card {
+    padding: 15px;
+  }
+
+  .weather-temperature {
+    font-size: 52px;
+  }
+
+  .forecast-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .weather-details {
+    gap: 10px;
+  }
+
+  .save-city-btn {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+
+}
+
+
+/* Small Mobile Devices - iPhone SE 2020 */
+@media (max-width: 375px) {
+
+  main {
+    padding: 16px 10px;
+  }
+
+  header {
+    gap: 8px;
+    margin-bottom: 25px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  header p {
+    font-size: 9px;
+  }
+
+  header button {
+    padding: 9px;
+  }
+
+  section {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  section h2 {
+    font-size: 23px;
+  }
+
+  input {
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+
+  footer {
+    font-size: 11px;
+  }
+}
+ 
